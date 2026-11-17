@@ -15,8 +15,8 @@ from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
 
-# logica do contexto do RAG
-def carregar_pdf(): # ler o pdf e extrair o texto do pdf
+
+def carregar_pdf():
     pdf_loader = PyPDFLoader("politica_rh.pdf")
     texto = pdf_loader.load()
     return texto
@@ -30,10 +30,9 @@ def separar_em_blocos(texto_pdf):
     lista_blocos = separador.split_documents(texto_pdf)
     return lista_blocos
 
-# print(texto_pdf)
+
 lista_blocos = separar_em_blocos(texto_pdf)
 
-# Embedding
 def criar_banco_vetores(lista_blocos):
     ferramenta_embedding = GoogleGenerativeAIEmbeddings(
     model="gemini-embedding-001"
@@ -43,7 +42,7 @@ def criar_banco_vetores(lista_blocos):
 
 banco_vetores = criar_banco_vetores(lista_blocos)
 
-# logica do agente de IA
+
 def criar_chain_agente(banco_vetores):
 
     prompt_template = ChatPromptTemplate.from_template(
@@ -75,19 +74,19 @@ def criar_chain_agente(banco_vetores):
 
 
 
-# interface
+
 
 st.title("Assistente RAG — Políticas Internas")
 
-# carregar chain e vector store
+
 chain = criar_chain_agente(banco_vetores)
 
 
-# inicia a lista de mensagens
+
 if "messages" not in st.session_state:
     st.session_state["messages"] = []
 
-# exibe as mensagens na tela
+
 for msg in st.session_state["messages"]:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
